@@ -24,7 +24,7 @@ contract Wallet is Ownable{
     // bytes32 is used since we cannot compare stirngs in solidity
     mapping (address => mapping(bytes32 => uint256)) public balances;
 
-    // Check is token exists in our exhange
+    // Check if token exists in our exhange
     modifier tokenExists(bytes32 _ticker){
         require(tokenMapping[_ticker].tokenAddress != address(0), "ticker does not exist in exhange");
         _;
@@ -40,6 +40,10 @@ contract Wallet is Ownable{
     function deposit(uint256 _amount, bytes32 _ticker) tokenExists(_ticker) external{
         IERC20(tokenMapping[_ticker].tokenAddress).transferFrom(msg.sender, address(this), _amount);
         balances[msg.sender][_ticker] = balances[msg.sender][_ticker].add(_amount);
+    }
+
+    function depositEth() payable external {
+        balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].add(msg.value);
     }
 
     // Withdraw tokens from the exhange
